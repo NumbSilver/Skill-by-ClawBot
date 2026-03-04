@@ -1,7 +1,332 @@
 # 02 - 图片生成：Nano Banana 2 一键生成大纲图片
 
+## 🎣 自媒体钩子 ( Hook )
+
+**标题备选：**
+1. "我裁掉了设计师：AI 配图工作流全公开"
+2. "从 3 天到 3 分钟：Nano Banana 2 让内容创作变天了"
+3. "别再手动找图了！这个一键生成工作流省了我 90% 时间"
+
+**开场金句：**
+> "昨天我用 15 分钟生成了一周的文章配图，质量比花¥5000 外包的还好。设计师朋友问我是不是要失业了，我说：不，是升级了。"
+
+**痛点共鸣：**
+- "你是不是也这样：文章写好了，为了找配图花 3 小时，最后还不满意？"
+- "素材网站的图千篇一律，设计师的图贵且慢，AI 生成的图... 嗯，看不懂？"
+
+**互动问题：**
+- "你为文章配图花过最多时间是多少？A) 30 分钟 B) 2 小时 C) 一整天 D) 直接不设"
+- "如果 AI 能一键生成你要的配图，但需要学习新工具，你愿意吗？"
+
+**转发理由：**
+> "内含完整代码和工作流，建议先收藏，用的时候找不到就可惜了。"
+
+---
+
 ## 核心论点
 > **内容创作的视觉化时代，配图成本应从「小时级」降至「秒级」。Nano Banana 2 工作流让大纲自动变配图。**
+
+---
+
+## 📊 配图建议
+
+**封面图：**
+- **概念**：左侧文字大纲 → 右侧精美配图，中间 AI 转换箭头
+- **风格**：对比式 Before/After，科技感渐变
+- **尺寸**：1200x630px (公众号), 1080x1350px (小红书竖版)
+- **AI Prompt**: "Split screen comparison, left side text outline document, right side beautiful illustrations, AI magic transformation arrow in middle, tech gradient background, before after style"
+
+**文中配图位置：**
+
+**图 2-1**: 配图成本对比柱状图
+- **位置**：1.2 章节
+- **形式**：分组柱状图 (传统 vs AI)
+- **指标**：时间成本、金钱成本、修改次数
+- **AI Prompt**: "Grouped bar chart comparison, traditional vs AI illustration workflow, time cost money cost metrics, clean business chart, blue orange colors"
+
+**图 2-2**: Nano Banana 2 架构图
+- **位置**：2.2 章节
+- **形式**：流程图 (输入→内容理解→Prompt 生成→图像生成→输出)
+- **风格**：技术架构图，扁平化设计
+- **AI Prompt**: "Flowchart diagram, AI image generation pipeline architecture, input to output process, modern tech illustration, flat design style"
+
+**图 2-3**: Prompt 工程对比示例
+- **位置**：4.1 章节
+- **形式**：左右对比图 (差 prompt vs 好 prompt 的生成结果)
+- **标注**：关键差异点用箭头标出
+- **AI Prompt**: "Side by side comparison, bad prompt result vs good prompt result, arrows highlighting differences, educational tutorial style"
+
+**图 2-4**: 风格一致性演示
+- **位置**：3.4 章节
+- **形式**：网格图 (6-9 张同风格不同内容的图)
+- **内容**：展示风格锁定效果
+- **AI Prompt**: "Grid layout 3x3, consistent style illustrations, different subjects same visual theme, portfolio showcase style"
+
+**图 2-5**: 工作流时间线
+- **位置**：4.4 章节
+- **形式**：横向时间轴 (传统 1-3 天 vs AI 15-30 分钟)
+- **视觉**：强烈的时间对比
+- **AI Prompt**: "Timeline comparison, traditional 3 days vs AI 30 minutes, dramatic time savings visualization, infographic style"
+
+**图 2-6**: ROI 计算信息图
+- **位置**：6.2 章节
+- **形式**：信息图 (投入、节省、回本周期)
+- **风格**：财务数据可视化
+- **AI Prompt**: "ROI calculation infographic, investment savings payback period, financial data visualization, professional consulting style"
+
+---
+
+## 🔬 技术原理深潜
+
+### 原理 1: Diffusion Model 是如何生成图像的？
+
+**核心思想：从噪声中「雕刻」出图像**
+
+```
+传统生成：从上到下 (先画轮廓，再填细节)
+Diffusion 生成：从模糊到清晰 (逐步去噪)
+
+类比：
+- 米开朗基罗说雕塑是「从石头中解放形象」
+- Diffusion 是「从噪声中解放图像」
+```
+
+**扩散过程详解：**
+
+```
+Step 1: 前向扩散 (加噪) - 训练阶段
+真实图像 → 逐步加高斯噪声 → 纯噪声
+
+数学表达:
+q(x_t | x_0) = N(x_t; √ᾱ_t x_0, (1-ᾱ_t)I)
+
+其中:
+- x_0: 原始图像
+- x_t: t 时刻的噪声图像
+- ᾱ_t: 噪声调度参数 (随 t 递减)
+- N: 高斯分布
+
+直观理解:
+t=0:    清晰图像 (100% 信号，0% 噪声)
+t=500:  半清晰 (50% 信号，50% 噪声)
+t=1000: 纯噪声 (0% 信号，100% 噪声)
+```
+
+```
+Step 2: 反向扩散 (去噪) - 生成阶段
+纯噪声 → U-Net 预测噪声 → 减去噪声 → 清晰图像
+
+核心：训练一个 U-Net 来预测每一步的噪声
+
+损失函数:
+L = E[||ε - ε_θ(x_t, t, c)||²]
+
+其中:
+- ε: 真实添加的噪声
+- ε_θ: U-Net 预测的噪声
+- c: 条件信号 (文本 prompt)
+
+训练目标：让预测噪声尽可能接近真实噪声
+```
+
+**为什么 Diffusion 比 GAN 好？**
+
+```
+GAN (Generative Adversarial Network):
+优点：生成快 (一步到位)
+缺点:
+  - 训练不稳定 (生成器 vs 判别器博弈)
+  - 模式坍塌 (只会生成几种图)
+  - 难以控制生成结果
+
+Diffusion:
+优点:
+  - 训练稳定 (明确的优化目标)
+  - 模式覆盖好 (不会坍塌)
+  - 生成质量高 (SOTA)
+  - 可控性强 (可以通过条件引导)
+缺点：生成慢 (需要多步迭代)
+
+2026 年现状:
+- 扩散模型已优化到 15-25 步 (原来需要 1000 步)
+- 蒸馏技术：1-4 步生成 (LCM, Distillation)
+- 质量 vs 速度的平衡点已找到
+```
+
+### 原理 2: Text-to-Image 的对齐机制
+
+**问题：如何让图像「理解」文本？**
+
+```
+方案 1: CLIP 对比学习对齐
+
+CLIP (Contrastive Language-Image Pre-training):
+- 训练 4 亿「图像 - 文本」对
+- 学习将匹配的图文映射到同一向量空间
+- 不匹配的推开
+
+训练后:
+文本编码器："一只在草地上奔跑的金毛犬" → [向量 512 维]
+图像编码器：[金毛犬照片] → [向量 512 维]
+
+如果匹配：两个向量余弦相似度接近 1
+如果不匹配：相似度接近 0
+
+应用:
+生成时，用文本向量作为条件，引导图像生成向这个方向靠近
+```
+
+```
+方案 2: Cross-Attention 融合
+
+Stable Diffusion 的核心创新:
+
+U-Net 结构中插入 Cross-Attention 层:
+
+Q (Query): 来自图像 latent
+K (Key), V (Value): 来自文本 embedding
+
+Attention(Q, K, V) = softmax(QK^T / √d) × V
+
+直观理解:
+- 图像的每个位置「查询」文本
+- 找到相关的文本词 (如「狗」对应图像中狗的位置)
+- 用这些信息指导去噪
+
+可视化效果:
+生成到第 20 步时:
+- 「狗」这个词的 attention 会聚焦在图像中狗的区域
+- 「草地」会聚焦在背景绿色区域
+- 「奔跑」会聚焦在运动模糊的方向
+```
+
+### 原理 3: Nano Banana 2 的优化点
+
+**为什么 Nano Banana 2 适合「大纲配图」场景？**
+
+```
+1. 内容理解增强
+
+传统模型：
+输入：「边际效益递减」→ 困惑 (太抽象)
+
+Nano Banana 2:
+- 内置概念库：5000+ 抽象概念的可视化映射
+- 「边际效益递减」→ 向下弯曲的曲线图
+- 「瓶颈」→ 狭窄的通道/墙壁
+- 「爆发」→ 爆炸/上升箭头
+
+实现方式:
+- 在 CLIP 文本编码器后加一层「概念扩展」
+- 抽象概念 → 具体视觉元素
+- 训练数据：10 万「概念 - 图像」对
+```
+
+```
+2. 风格一致性引擎
+
+问题：如何保证系列配图风格统一？
+
+传统方案：手动调整 prompt，靠运气
+
+Nano Banana 2 方案:
+a) 风格锁 (Style Lock):
+   - 提取参考图的风格向量 (颜色、线条、纹理)
+   - 在生成时注入这个向量
+   - 公式：x_t = diffusion(x_t) + λ × style_vector
+   
+b) 批次优化:
+   - 不是单张生成，而是一批 jointly 优化
+   - 添加「风格一致性损失」:
+     L_style = ||style(img₁) - style(img₂)||²
+   - 强制同批次图片风格接近
+
+c) 模板继承:
+   - 定义风格模板 (科技极简、数据可视化等)
+   - 模板 = 预设的 prompt 前缀 + 参数配置
+   - 用户只需选模板，不用调参数
+```
+
+```
+3. 大纲解析器
+
+创新点：直接从大纲提取视觉元素
+
+传统流程:
+大纲 → 人工写 prompt → 生成图片
+
+Nano Banana 2:
+大纲 → OutlineParser → 结构化视觉元素 → 自动生成 prompt → 图片
+
+Parser 工作原理:
+- 关键词提取：TF-IDF + TextRank
+- 场景识别：分类器 (场景/概念/人物/物体)
+- 情感分析：判断语调 (严肃/活泼/专业)
+- 隐喻映射：抽象→具体 (用知识图谱)
+
+示例:
+输入大纲:
+"## LLM 的瓶颈
+- 边际效益递减
+- 训练数据边界"
+
+输出结构:
+[
+  {"type": "concept", "text": "边际效益递减", "visual": "downward_curve"},
+  {"type": "concept", "text": "训练数据边界", "visual": "wall_or_boundary"}
+]
+
+再生成对应 prompt:
+- "A downward curving line chart showing diminishing returns, data visualization style"
+- "A wall or boundary symbolizing limits, minimalist tech illustration"
+```
+
+### 原理 4: 批量生成的并行优化
+
+**如何实现「秒级」生成多张图？**
+
+```
+瓶颈分析:
+单张生成时间 = 模型加载 + Prompt 处理 + 扩散迭代 + 解码
+
+传统串行:
+图 1 [████████] 5 秒
+图 2         [████████] 5 秒
+图 3                 [████████] 5 秒
+总计：15 秒
+
+Nano Banana 2 并行优化:
+
+1. 模型预加载:
+   - 启动时就加载模型到 GPU
+   - 避免每次生成的加载时间 (可省 1-2 秒)
+
+2. Prompt 批量编码:
+   - 10 个 prompt 一起过 CLIP 编码器
+   - 利用 GPU 的 batch 并行能力
+   - 时间从 10×0.1 秒 → 0.3 秒
+
+3. 扩散过程共享:
+   - 同风格的图，前期扩散过程相似
+   - 共享前 10 步的 latent
+   - 从第 11 步开始分化
+   - 节省 30-40% 计算
+
+4. 流水线并行:
+   图 1: [Diffusion 步 1-20] → [VAE 解码]
+   图 2: [Diffusion 步 1-20]    (同时进行)
+   图 3: [Diffusion 步 1-20]
+   
+   通过 CUDA Stream 实现真正的并行
+
+最终效果:
+首张：5 秒
+后续每张：+1.5 秒 (而不是 +5 秒)
+
+10 张图：5 + 9×1.5 = 18.5 秒 (而不是 50 秒)
+```
+
+---
 
 ---
 
